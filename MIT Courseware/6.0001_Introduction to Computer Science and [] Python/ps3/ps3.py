@@ -103,7 +103,10 @@ def get_word_score(word, n):
     sum_of_letters = 0
     
     for i in range (word_length):
-        sum_of_letters += SCRABBLE_LETTER_VALUES[word[i]]
+        if (word[i] == '*'):
+            sum_of_letters += 1
+        else:
+            sum_of_letters += SCRABBLE_LETTER_VALUES[word[i]]
         #TESTER VVV
         # print(sum_of_letters)
     
@@ -335,7 +338,7 @@ def is_valid_word(word, hand, word_list):
     return True
 
 #TESTERS VVVV
-word_list = load_words()
+# word_list = load_words()
 # handOrig = {'a':1, 'q':1, 'l':2, 'm':1, 'u':1, 'i':1}
 # print(is_valid_word("quail", handOrig, word_list))
 
@@ -350,13 +353,13 @@ word_list = load_words()
 #display_hand(handy)
 # print(is_valid_word("c*w", handy, word_list))
 
-hand = {'n': 1, 'h': 1, '*': 1, 'y': 1, 'd':1, 'w':1, 'e': 2}
-word = "honey"
-print(is_valid_word(word, hand, word_list))
+# hand = {'n': 1, 'h': 1, '*': 1, 'y': 1, 'd':1, 'w':1, 'e': 2}
+# word = "honey"
+# print(is_valid_word(word, hand, word_list))
 
-hand = {'n': 1, 'h': 1, '*': 1, 'y': 1, 'd':1, 'w':1, 'e': 2}
-word = "h*ney"
-print(is_valid_word(word, hand, word_list))
+# hand = {'n': 1, 'h': 1, '*': 1, 'y': 1, 'd':1, 'w':1, 'e': 2}
+# word = "h*ney"
+# print(is_valid_word(word, hand, word_list))
 
 #
 # Problem #5: Playing a hand
@@ -368,8 +371,25 @@ def calculate_handlen(hand):
     hand: dictionary (string-> int)
     returns: integer
     """
+    length = 0
     
-    pass  # TO DO... Remove this line when you implement this function
+    # VOWELS
+    # CONSONANT
+    
+    possible_keys = VOWELS+CONSONANTS+'*'
+    # print(possible_keys)
+    
+    for i in range (len(possible_keys)):
+        if possible_keys[i] in hand:
+            
+            length += hand[possible_keys[i]]
+    
+    return length
+
+#TESTERS VVV
+# hand = {'n': 3, 'h': 1, '*': 20, 'y': 1, 'd':1, 'w':1, 'e': 1}
+# #length should be 8
+# print(calculate_handlen(hand))
 
 def play_hand(hand, word_list):
 
@@ -404,36 +424,61 @@ def play_hand(hand, word_list):
     
     # BEGIN PSEUDOCODE <-- Remove this comment when you implement this function
     # Keep track of the total score
-    
+    score = 0
+    n = calculate_handlen(hand)
     # As long as there are still letters left in the hand:
+    print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
     
-        # Display the hand
+    print("\nEnter a word created from the letters in your hand!\n(Type !! to end the game)\n")
+    # Display the hand
+    display_hand(hand)
+    while n > 0:
         
         # Ask user for input
+        print()
+        inputting = True
         
+        break_loop = False
+        
+        while (inputting):
+            user_input = input()
         # If the input is two exclamation points:
-        
+            if (user_input == "!!"):
+                break_loop = True
+                break
             # End the game (break out of the loop)
-
             
         # Otherwise (the input is not two exclamation points):
-
+            else:
             # If the word is valid:
-
+                if (is_valid_word(user_input, hand, word_list)):
+                    
                 # Tell the user how many points the word earned,
                 # and the updated total score
-
+                    points = get_word_score(user_input, n)
+                    score += points
+                    print("\nGreat! The word "+user_input+" earned you "+str(points)+"points!\n(You now have "+str(score)+" points.)")
+                    # update the user's hand by removing the letters of their inputted word
+                    hand = update_hand(hand, user_input)
+                    inputting = False
+                    
             # Otherwise (the word is not valid):
                 # Reject invalid word (print a message)
-                
-            # update the user's hand by removing the letters of their inputted word
+                else:
+                    inputting = False
             
-
+            n = calculate_handlen(hand)
+            # if (n > 0):
+            #     print()
+            #     display_hand(hand)
+           
     # Game is over (user entered '!!' or ran out of letters),
+        if (break_loop or n <= 0):
+            break
     # so tell user the total score
-
+    print("\nYou earned a total of "+str(score)+" points!")
     # Return the total score as result of function
-
+    
 
 
 #
@@ -502,7 +547,54 @@ def play_game(word_list):
     word_list: list of lowercase strings
     """
     
-    print("play_game not implemented.") # TO DO... Remove this line when you implement this function
+    # print("play_game not implemented.") # TO DO... Remove this line when you implement this function
+    
+    print("\nHello, and welcome to Word Game!")
+    print("\nUsing a hand of letters, construct words to earn points!\nLonger words are worth more points.")
+    print("Letters are valued the same as Scrabble letters.")
+    
+    print("\nHow many hands will you play?\n")
+    inputting = True
+    hands = 0
+    while (inputting):
+        hands = input()
+        if (hands.isdigit() and int(hands) == 1):
+            print("\nOkay, you will play "+str(hands)+" round.")
+            inputting = False
+        elif (hands.isdigit() and int(hands) > 1):
+            print("\nOkay, you will play "+str(hands)+" rounds.")
+            inputting = False
+            
+        else:
+            print("\nPlease take this seriously dude...\n")
+    
+    total_score = 0
+    replay_available = True
+    for i in range(int(hands)):
+        round = 0
+        round += 1
+        print("\n\nROUND "+str(round)+"!")
+        
+        if (replay_available):
+            #hard coded for only one replay. Could make all of this variable
+            while (replay_available):
+                round_score = 0
+                hand = deal_hand(HAND_SIZE)
+                round_score += play_hand(hand,word_list)
+                
+                print("Would you like to replay that hand?\n(You only get to do this once per session)\n")
+                response = input()
+                if  response == "Si" or response == "si" or response == "Yes" or response == "yes" or response == "Y" or response == "y" or response == "ay" or response == "Ok" or response == "OK" or response == "ok" or response == "k" or response == "K":
+                    replay_available = False
+                    round_score += play_hand(hand,word_list)
+                else:
+                    total_score += round_score
+        else:
+            hand = deal_hand(HAND_SIZE)
+            total_score += play_hand(hand,word_list)
+            
+            
+    
     
 
 
@@ -513,5 +605,5 @@ def play_game(word_list):
 #
 if __name__ == '__main__':
     #AARON COMMENTED THIS OUT!!!!!!!!! Fix it man before submission
-    # word_list = load_words()
+    word_list = load_words()
     play_game(word_list)
