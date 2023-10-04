@@ -297,7 +297,7 @@ def is_valid_word(word, hand, word_list):
     
     #if gottem is False, the word does not exist in the word list
     if not gottem:
-        print("\nThat word does not exist in the game's word bank.. sorry!")
+        print("\nThat word does not exist in the game's word bank.. sorry!\n")
         return False
     
     #STEP 2: check if the word can actually be composed out of the letters existing in the hand
@@ -431,8 +431,8 @@ def play_hand(hand, word_list):
     
     print("\nEnter a word created from the letters in your hand!\n(Type !! to end the game)\n")
     # Display the hand
-    display_hand(hand)
     while n > 0:
+        display_hand(hand)
         
         # Ask user for input
         print()
@@ -457,7 +457,7 @@ def play_hand(hand, word_list):
                 # and the updated total score
                     points = get_word_score(user_input, n)
                     score += points
-                    print("\nGreat! The word "+user_input+" earned you "+str(points)+"points!\n(You now have "+str(score)+" points.)")
+                    print("\nGreat! The word "+user_input+" earned you "+str(points)+" points!\n(You now have "+str(score)+" points.)")
                     # update the user's hand by removing the letters of their inputted word
                     hand = update_hand(hand, user_input)
                     inputting = False
@@ -478,7 +478,7 @@ def play_hand(hand, word_list):
     # so tell user the total score
     print("\nYou earned a total of "+str(score)+" points!")
     # Return the total score as result of function
-    
+    return score
 
 
 #
@@ -512,9 +512,48 @@ def substitute_hand(hand, letter):
     letter: string
     returns: dictionary (string -> int)
     """
+    new_hand = hand.copy()
     
-    pass  # TO DO... Remove this line when you implement this function
-       
+    letter = letter.lower()
+    
+    all_letters = VOWELS+CONSONANTS
+    
+    new_letter = 'a'
+    
+    selecting = True
+    
+    if not letter in new_hand:
+        return new_hand
+    else:
+        while (selecting):
+            new_letter = random.choice(all_letters)
+            # print(new_letter)
+            if not new_letter in new_hand:
+                selecting = False
+        #VVV this pops out the old letter and replaces it with the new letter
+        new_hand[new_letter] = new_hand.pop(letter)
+        
+    
+    return new_hand
+
+# hand = {'n': 3, 'h': 1, '*': 2, 'y': 1, 'd':1, 'w':1, 'e': 1}
+# print(hand)
+# print(substitute_hand(hand, 'y'))
+    
+   
+    #accepts a string and then checks to see if the string says some type of yes! 
+    #returns true or false
+    
+def check_affirmation(response):
+    if (response == "OK" or response == "YES" or response == "Si" or response == "si" or response == "Yes" or response == "yes" or response == "Y" or response == "y" or response == "ay" or response == "Ok" or response == "OK" or response == "ok" or response == "k" or response == "K"):
+        return True
+    return False
+
+#TESTERS VVV
+# print(check_affirmation("no"))
+# print(check_affirmation("y"))
+# print(check_affirmation("YES"))
+# print(check_affirmation(":P"))
     
 def play_game(word_list):
     """
@@ -556,6 +595,7 @@ def play_game(word_list):
     print("\nHow many hands will you play?\n")
     inputting = True
     hands = 0
+    round = 0
     while (inputting):
         hands = input()
         if (hands.isdigit() and int(hands) == 1):
@@ -570,34 +610,54 @@ def play_game(word_list):
     
     total_score = 0
     replay_available = True
+    swap_available = True
     for i in range(int(hands)):
-        round = 0
+
         round += 1
         print("\n\nROUND "+str(round)+"!")
+        
+        hand = deal_hand(HAND_SIZE)
+        if (swap_available):
+            print("\nYour hand:")
+            display_hand(hand)
+        
+        if (swap_available):
+            print("\nYou have a letter swap available...\nwould you like to swap a letter in your hand for a random new letter?\n")
+            response = input()
+            if  (check_affirmation(response)):
+                print("\nWhich letter would you like to swap?\n")
+                swap_available = False
+                letter = input()
+                hand = substitute_hand(hand, letter)
+                # display_hand(hand)
+            
         
         if (replay_available):
             #hard coded for only one replay. Could make all of this variable
             while (replay_available):
                 round_score = 0
-                hand = deal_hand(HAND_SIZE)
+                # hand = deal_hand(HAND_SIZE)
                 round_score += play_hand(hand,word_list)
                 
-                print("Would you like to replay that hand?\n(You only get to do this once per session)\n")
+                print("\nWould you like to replay that hand?")
+                display_hand(hand)
+                print("(You only get to do this once per session)\n")
+                
                 response = input()
-                if  response == "Si" or response == "si" or response == "Yes" or response == "yes" or response == "Y" or response == "y" or response == "ay" or response == "Ok" or response == "OK" or response == "ok" or response == "k" or response == "K":
+                if  (check_affirmation(response)):
                     replay_available = False
                     round_score += play_hand(hand,word_list)
                 else:
                     total_score += round_score
+                    break
         else:
-            hand = deal_hand(HAND_SIZE)
+            # hand = deal_hand(HAND_SIZE)
             total_score += play_hand(hand,word_list)
-            
-            
     
+    print("\nFinal score across "+str(hands)+" hands: "+str(total_score))
+    print("Thank you for playing! :)")
+        
     
-
-
 #
 # Build data structures used for entire session and play game
 # Do not remove the "if __name__ == '__main__':" line - this code is executed
