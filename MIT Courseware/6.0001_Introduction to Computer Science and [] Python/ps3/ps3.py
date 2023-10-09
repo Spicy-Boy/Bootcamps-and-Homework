@@ -110,7 +110,7 @@ def get_word_score(word, n):
         #TESTER VVV
         # print(sum_of_letters)
     
-    second_component = 7*word_length-3*(n-word_length) #rewars the player for longer words and penalizes leftover letters in hand
+    second_component = 7*word_length-3*(n-word_length) #rewards the player for longer words and penalizes leftover letters in hand
     #TESTER VVV
     # print(str(sum_of_letters)+"+7*"+str(word_length)+"-3*("+str(n)+"-"+str(word_length)+")")
     if second_component < 1:
@@ -122,6 +122,17 @@ def get_word_score(word, n):
 #TESTER VVV
 #Example: weed should be worth 176 with a hand size of 6
 # print(get_word_score("weed",6))
+
+# print(get_word_score("w*s",7))
+# print(get_word_score("fork",4))
+# print()
+# print(get_word_score("honey",7))
+# print(get_word_score("cows",6))
+# print(get_word_score("wails",7))
+# print()
+# print(get_word_score("h*ney",7))
+# print(get_word_score("c*ws",6))
+# print(get_word_score("wa*ls",7))
 
 #
 # Make sure you understand how this function works and what it does!
